@@ -48,10 +48,10 @@
           pkgs.nix-index
 
           # If you want the Rust compiler toolchain itself for development:
-              pkgs.rustc
-              pkgs.cargo
-              # Optional: Rust language server for editor integration
-              pkgs.rust-analyzer
+            pkgs.rustc
+            pkgs.cargo
+            # Optional: Rust language server for editor integration
+            pkgs.rust-analyzer
         ];
 
         # Necessary for using flakes on this system.

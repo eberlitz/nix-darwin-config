@@ -44,14 +44,7 @@
           pkgs.starship # Minimal, blazing-fast, and infinitely customizable prompt
 
           pkgs.helix
-
-          pkgs.nix-index
-
-          # If you want the Rust compiler toolchain itself for development:
-            pkgs.rustc
-            pkgs.cargo
-            # Optional: Rust language server for editor integration
-            pkgs.rust-analyzer
+          pkgs.uv
         ];
 
         # Necessary for using flakes on this system.
@@ -60,7 +53,7 @@
 
 
       # Enable alternative shell support in nix-darwin.
-      # programs.fish.enable = true;
+      programs.fish.enable = true;
 
       # Set Git commit hash for darwin-version.
       system.configurationRevision = self.rev or self.dirtyRev or null;

@@ -45,6 +45,8 @@
 
           pkgs.helix
           pkgs.uv
+
+          pkgs.nixd # LSP for nix files
         ];
 
         # Necessary for using flakes on this system.

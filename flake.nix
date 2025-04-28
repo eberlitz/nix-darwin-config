@@ -131,6 +131,6 @@
           home-manager.darwinModules.home-manager
         ];
       };
-      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt-rfc-style;
+      formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;
     };
 }

@@ -68,13 +68,23 @@
             nixd # LSP for nix files
           ];
 
+          environment.shells = [
+              pkgs.fish
+            ];
+
           environment.variables.EDITOR = "hx";
 
           # Necessary for using flakes on this system.
           nix.enable = false;
 
           # Enable alternative shell support in nix-darwin.
-          programs.fish.enable = true;
+          programs.fish = {
+            enable = true;
+            shellInit = '';
+              set fish_greeting
+            '';
+            greeting = "";
+          };
 
           # Set Git commit hash for darwin-version.
           system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -97,6 +107,7 @@
             dock.mru-spaces = false;
             finder.AppleShowAllExtensions = true;
             finder.FXPreferredViewStyle = "clmv";
+            loginwindow.LoginwindowText = "eberlitz";
             screencapture.location = "~/Pictures/screenshots";
             screensaver.askForPasswordDelay = 10;
           };
@@ -105,6 +116,10 @@
           fonts.packages = with pkgs; [
             nerd-fonts.fira-code
           ];
+
+          networking.hostName = hostname;
+          networking.computerName = hostname;
+          system.defaults.smb.NetBIOSName = hostname;
 
           # Define the primary user for Home Manager and system settings
             users.users.${username} = {

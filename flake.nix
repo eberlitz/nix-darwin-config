@@ -20,6 +20,9 @@
       ...
     }:
     let
+      username = "eberlitz";
+      hostname = "eberlitz-MacBook-Pro";
+      system = "aarch64-darwin";
       configuration =
         { pkgs, ... }:
         {
@@ -67,7 +70,6 @@
 
           # Necessary for using flakes on this system.
           nix.enable = false;
-          nix.settings.experimental-features = "nix-command flakes";
 
           # Enable alternative shell support in nix-darwin.
           programs.fish.enable = true;
@@ -103,17 +105,27 @@
             fira-code-nerdfont
             nerd-fonts.fira-code
           ];
+
+          # Define the primary user for Home Manager and system settings
+            users.users.${username} = {
+              home = "/Users/${username}";
+              # Add other user settings if needed, like groups
+            };
+            # Let Home Manager manage itself
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
         };
     in
     {
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#eberlitz-MacBook-Pro
-      darwinConfigurations."eberlitz-MacBook-Pro" = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin"; # Good practice
+      darwinConfigurations.${hostname} = nix-darwin.lib.darwinSystem {
+        specialArgs = {
+          inherit inputs username hostname;
+        };
+        inherit system;
         modules = [ configuration ];
       };
-      formatter = {
-        "aarch64-darwin" = nixpkgs.legacyPackages."aarch64-darwin".nixfmt-rfc-style;
-      };
+      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt-rfc-style;
     };
 }

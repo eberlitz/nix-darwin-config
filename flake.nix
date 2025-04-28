@@ -5,9 +5,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager = {
+          url = "github:nix-community/home-manager";
+          inputs.nixpkgs.follows = "nix-darwin";
+        };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs }:
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, ... }:
   let
     configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
@@ -43,13 +47,18 @@
           # Shell / Terminal Enhancement
           pkgs.starship # Minimal, blazing-fast, and infinitely customizable prompt
 
-          pkgs.helix
-          pkgs.uv
+          pkgs.helix # rust powered text editor
+          pkgs.uv # Python module manager
+
+          pkgs.just # Command-line utility for running shell commands
 
           pkgs.nixd # LSP for nix files
         ];
 
-        # Necessary for using flakes on this system.
+      environment.variables.EDITOR = "hx";
+
+
+      # Necessary for using flakes on this system.
       nix.enable = false;
       nix.settings.experimental-features = "nix-command flakes";
 
@@ -78,10 +87,16 @@
         dock.mru-spaces = false;
         finder.AppleShowAllExtensions = true;
         finder.FXPreferredViewStyle = "clmv";
-        loginwindow.LoginwindowText = "nixcademy.com";
         screencapture.location = "~/Pictures/screenshots";
         screensaver.askForPasswordDelay = 10;
       };
+
+      # Fonts configuration
+      fonts.packages = with pkgs; [
+        fira-code
+        fira-code-nerdfont
+        nerd-fonts.fira-code
+      ];
     };
   in
   {
@@ -91,5 +106,6 @@
       system = "aarch64-darwin"; # Good practice
       modules = [ configuration ];
     };
+    formatter = { "aarch64-darwin" = nixpkgs.legacyPackages."aarch64-darwin".nixfmt-rfc-style; };
   };
 }

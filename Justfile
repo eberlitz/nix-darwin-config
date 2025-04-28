@@ -10,5 +10,9 @@ up:
     darwin-rebuild switch --flake .
 
 [group('nix')]
+rebuild:
+    darwin-rebuild switch --flake .
+
+[group('nix')]
 fmt:
     nix fmt

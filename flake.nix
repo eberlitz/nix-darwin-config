@@ -7,7 +7,7 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -23,47 +23,47 @@
       username = "eberlitz";
       hostname = "eberlitz-MacBook-Pro";
       system = "aarch64-darwin";
-      configuration =
-        { pkgs, ... }:
+      mainConfigurationModule =
+        { pkgs, config, lib, ... }:
         {
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
-          environment.systemPackages = [
-            pkgs.vim
-            pkgs.git
+          environment.systemPackages = with pkgs ; [
+            vim
+            git
 
             # JSON processor
-            pkgs.jq
+            jq
             # command line fuzzy finder
-            pkgs.fzf
+            fzf
 
-            pkgs.fish
+            fish
 
             # Core Utils / Replacements
-            pkgs.ripgrep # Extremely fast recursive line searching (like grep)
-            pkgs.fd # Simple, fast, and user-friendly alternative to find
-            pkgs.bat # A cat clone with syntax highlighting and Git integration
-            pkgs.eza # A modern replacement for ls (previously exa)
-            pkgs.zoxide # A smarter cd command that learns your habits
-            pkgs.dust # More intuitive version of du (package name: du-dust)
-            pkgs.duf # Disk Usage/Free Utility
+            ripgrep # Extremely fast recursive line searching (like grep)
+            fd # Simple, fast, and user-friendly alternative to find
+            bat # A cat clone with syntax highlighting and Git integration
+            eza # A modern replacement for ls (previously exa)
+            zoxide # A smarter cd command that learns your habits
+            dust # More intuitive version of du (package name: du-dust)
+            duf # Disk Usage/Free Utility
 
             # Development / Git
-            pkgs.hyperfine # Command-line benchmarking tool
-            pkgs.tokei # Displays statistics about your code
+            hyperfine # Command-line benchmarking tool
+            tokei # Displays statistics about your code
 
             # System / Monitoring
-            pkgs.bottom # Graphical cross-platform process/system monitor
+            bottom # Graphical cross-platform process/system monitor
 
             # Shell / Terminal Enhancement
-            pkgs.starship # Minimal, blazing-fast, and infinitely customizable prompt
+            starship # Minimal, blazing-fast, and infinitely customizable prompt
 
-            pkgs.helix # rust powered text editor
-            pkgs.uv # Python module manager
+            helix # rust powered text editor
+            uv # Python module manager
 
-            pkgs.just # Command-line utility for running shell commands
+            just # Command-line utility for running shell commands
 
-            pkgs.nixd # LSP for nix files
+            nixd # LSP for nix files
           ];
 
           environment.variables.EDITOR = "hx";
@@ -101,8 +101,6 @@
 
           # Fonts configuration
           fonts.packages = with pkgs; [
-            fira-code
-            fira-code-nerdfont
             nerd-fonts.fira-code
           ];
 
@@ -112,8 +110,11 @@
               # Add other user settings if needed, like groups
             };
             # Let Home Manager manage itself
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.${username} = import ./modules/home.nix {
+              inherit inputs pkgs config lib username;
+            };
         };
     in
     {
@@ -124,7 +125,11 @@
           inherit inputs username hostname;
         };
         inherit system;
-        modules = [ configuration ];
+        modules = [
+          mainConfigurationModule
+
+          home-manager.darwinModules.home-manager
+        ];
       };
       formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt-rfc-style;
     };

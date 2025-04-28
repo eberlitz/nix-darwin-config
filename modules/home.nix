@@ -29,6 +29,8 @@
     packages = with pkgs; [
       # Add your packages here
       starship # Minimal, blazing-fast, and infinitely customizable prompt
+      docker
+      colima
     ];
   };
 

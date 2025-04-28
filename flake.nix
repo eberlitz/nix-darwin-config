@@ -83,7 +83,6 @@
             shellInit = '';
               set fish_greeting
             '';
-            greeting = "";
           };
 
           # Set Git commit hash for darwin-version.

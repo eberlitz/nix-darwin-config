@@ -23,6 +23,9 @@
       username = "eberlitz";
       hostname = "eberlitz-MacBook-Pro";
       system = "aarch64-darwin";
+      specialArgs = {
+        inherit inputs username hostname;
+      };
       mainConfigurationModule =
         { pkgs, config, lib, ... }:
         {
@@ -56,7 +59,6 @@
             bottom # Graphical cross-platform process/system monitor
 
             # Shell / Terminal Enhancement
-            starship # Minimal, blazing-fast, and infinitely customizable prompt
 
             helix # rust powered text editor
             uv # Python module manager
@@ -109,26 +111,27 @@
               home = "/Users/${username}";
               # Add other user settings if needed, like groups
             };
-            # Let Home Manager manage itself
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.${username} = import ./modules/home.nix {
-              inherit inputs pkgs config lib username;
-            };
+
         };
     in
     {
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#eberlitz-MacBook-Pro
       darwinConfigurations.${hostname} = nix-darwin.lib.darwinSystem {
-        specialArgs = {
-          inherit inputs username hostname;
-        };
+
         inherit system;
         modules = [
+          ./modules/system.nix
           mainConfigurationModule
 
           home-manager.darwinModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.users.${username} = import ./modules/home.nix;
+            home-manager.backupFileExtension = "backup";
+          }
         ];
       };
       formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;

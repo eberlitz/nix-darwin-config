@@ -5,10 +5,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
@@ -16,22 +12,17 @@
       self,
       nixpkgs,
       nix-darwin,
-      home-manager,
       ...
     }:
     let
-      username = "eberlitz";
       hostname = "eberlitz-MacBook-Pro";
       system = "aarch64-darwin";
-      specialArgs = {
-        inherit inputs username hostname;
-      };
       mainConfigurationModule =
-        { pkgs, config, lib, ... }:
+        { pkgs, ... }:
         {
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
-          environment.systemPackages = with pkgs ; [
+          environment.systemPackages = with pkgs; [
             vim
             git
 
@@ -66,11 +57,15 @@
             just # Command-line utility for running shell commands
 
             nixd # LSP for nix files
+            nil # LSP for nix files
+            starship # Minimal, blazing-fast, and infinitely customizable prompt
+
+            direnv
           ];
 
           environment.shells = [
-              pkgs.fish
-            ];
+            pkgs.fish
+          ];
 
           environment.variables.EDITOR = "hx";
 
@@ -80,13 +75,15 @@
           # Enable alternative shell support in nix-darwin.
           programs.fish = {
             enable = true;
-            shellInit = '';
-              set fish_greeting
+            shellInit = ''
+              ;
+                            set fish_greeting
             '';
           };
 
           # Set Git commit hash for darwin-version.
           system.configurationRevision = self.rev or self.dirtyRev or null;
+          system.primaryUser = "eberlitz";
 
           # Used for backwards compatibility, please read the changelog before changing.
           # $ darwin-rebuild changelog
@@ -118,13 +115,7 @@
 
           networking.hostName = hostname;
           networking.computerName = hostname;
-          system.defaults.smb.NetBIOSName = hostname;
-
-          # Define the primary user for Home Manager and system settings
-            users.users.${username} = {
-              home = "/Users/${username}";
-              # Add other user settings if needed, like groups
-            };
+          # system.defaults.smb.NetBIOSName = hostname;
 
         };
     in
@@ -137,15 +128,6 @@
         modules = [
           ./modules/system.nix
           mainConfigurationModule
-
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.${username} = import ./modules/home.nix;
-            home-manager.backupFileExtension = "backup";
-          }
         ];
       };
       formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;

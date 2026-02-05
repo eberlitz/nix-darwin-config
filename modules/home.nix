@@ -1,14 +1,7 @@
 { pkgs, lib, username, ... }:
 
 {
-  programs.fish = {
-    enable = true;
-
-    #interactiveShellInit = ''
-    #  zoxide init fish | source
-    #'';
-  };
-
+  programs.fish.enable = true;
   programs.bash.enable = true;
   programs.zsh.enable = true;
   programs.zoxide.enable = true;
@@ -27,10 +20,21 @@
       '';
 
     packages = with pkgs; [
+      # C++ dev tools
+      cmake
+      gettext
+      libtool
+      automake
+      autoconf
+      texinfo
       # Add your packages here
       starship # Minimal, blazing-fast, and infinitely customizable prompt
       docker
       colima
+    ];
+
+    sessionPath = [
+      "$home/"
     ];
   };
 
@@ -48,7 +52,7 @@
     enable = true;
 
     userName = "Eduardo Eidelwein Berlitz";
-    userEmail = "eberlitz@gmail.com";
+    userEmail = "1980796+eberlitz@users.noreply.github.com";
     extraConfig = {
       init.defaultBranch = "main";
     };

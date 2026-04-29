@@ -8,7 +8,7 @@
   homebrew = {
     enable = true;
     brews = [
-      
+      "fnm"
     ];
     casks = [
     ];

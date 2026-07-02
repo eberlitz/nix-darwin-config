@@ -1,0 +1,2 @@
+{"id":"f1","kind":"file","summary":"flake.nix already contains both changes: nix.enable comment (lines 78-80) and home-manager.backupFileExtension (line 149)","source":"file","paths":["flake.nix"],"accepted":true,"created_at":"2026-07-02T10:03:58.64085Z"}
+{"id":"f2","kind":"manual","summary":"Manual inspection confirmed both requested changes are present in the file. The darwin-rebuild switch should now succeed without clobber errors.","source":"manual","paths":["flake.nix"],"accepted":true,"created_at":"2026-07-02T10:03:58.646662Z"}

@@ -5,17 +5,23 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     inputs@{
       self,
+      home-manager,
       nixpkgs,
       nix-darwin,
       ...
     }:
     let
       hostname = "eberlitz-MacBook-Pro";
+      username = "eberlitz";
       system = "aarch64-darwin";
       mainConfigurationModule =
         { pkgs, ... }:
@@ -69,28 +75,32 @@
 
           environment.variables.EDITOR = "hx";
 
-          # Necessary for using flakes on this system.
+          # Disabled because the Determinate Nix Installer manages the daemon;
+          # enabling it here would conflict with it.
           nix.enable = false;
 
           # Enable alternative shell support in nix-darwin.
           programs.fish = {
             enable = true;
             shellInit = ''
-              ;
-                            set fish_greeting
+              set fish_greeting
             '';
           };
 
           # Set Git commit hash for darwin-version.
           system.configurationRevision = self.rev or self.dirtyRev or null;
-          system.primaryUser = "eberlitz";
+          system.primaryUser = username;
+          users.users.${username} = {
+            home = "/Users/${username}";
+            name = username;
+          };
 
           # Used for backwards compatibility, please read the changelog before changing.
           # $ darwin-rebuild changelog
           system.stateVersion = 6;
 
           # The platform the configuration will be used on.
-          nixpkgs.hostPlatform = "aarch64-darwin";
+          nixpkgs.hostPlatform = system;
 
           # allows touch id authentication in terminal
           security.pam.services.sudo_local.touchIdAuth = true;
@@ -123,10 +133,22 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#eberlitz-MacBook-Pro
       darwinConfigurations.${hostname} = nix-darwin.lib.darwinSystem {
-
         inherit system;
+        specialArgs = {
+          inherit inputs hostname;
+        };
         modules = [
           ./modules/system.nix
+          home-manager.darwinModules.home-manager
+          {
+            home-manager.extraSpecialArgs = {
+              inherit inputs username;
+            };
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "backup";
+            home-manager.users.${username} = import ./modules/home.nix;
+          }
           mainConfigurationModule
         ];
       };

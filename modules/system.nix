@@ -1,4 +1,4 @@
-{ pkgs, config, lib, username, ... }:
+{ ... }:
 
 {
   programs.fish.enable = true;

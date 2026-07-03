@@ -28,11 +28,18 @@
       autoconf
       texinfo
       # Add your packages here
+      fnm
       starship # Minimal, blazing-fast, and infinitely customizable prompt
       docker
       colima
     ];
   };
+
+  xdg.configFile."fish/conf.d/fnm.fish".text = ''
+    if command -q fnm
+        fnm env --use-on-cd --shell fish | source
+    end
+  '';
 
   programs.starship = {
     enable = true;
